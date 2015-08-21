@@ -14,6 +14,7 @@
 		7D01F2F21B837DEB005EDD72 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7D01F2F11B837DEB005EDD72 /* Images.xcassets */; };
 		7D01F2F51B837DEB005EDD72 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D01F2F31B837DEB005EDD72 /* LaunchScreen.xib */; };
 		7D01F3011B837DEB005EDD72 /* MultiplyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D01F3001B837DEB005EDD72 /* MultiplyTests.m */; };
+		7D01F30D1B877295005EDD72 /* Calculation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D01F30C1B877295005EDD72 /* Calculation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,8 @@
 		7D01F2FA1B837DEB005EDD72 /* MultiplyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MultiplyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D01F2FF1B837DEB005EDD72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7D01F3001B837DEB005EDD72 /* MultiplyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MultiplyTests.m; sourceTree = "<group>"; };
+		7D01F30B1B877295005EDD72 /* Calculation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Calculation.h; path = Model/Calculation.h; sourceTree = "<group>"; };
+		7D01F30C1B877295005EDD72 /* Calculation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Calculation.m; path = Model/Calculation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +84,7 @@
 		7D01F2E31B837DEB005EDD72 /* Multiply */ = {
 			isa = PBXGroup;
 			children = (
+				7D01F30A1B87725F005EDD72 /* Model */,
 				7D01F2E81B837DEB005EDD72 /* AppDelegate.h */,
 				7D01F2E91B837DEB005EDD72 /* AppDelegate.m */,
 				7D01F2EB1B837DEB005EDD72 /* ViewController.h */,
@@ -117,6 +121,15 @@
 				7D01F2FF1B837DEB005EDD72 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		7D01F30A1B87725F005EDD72 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				7D01F30B1B877295005EDD72 /* Calculation.h */,
+				7D01F30C1B877295005EDD72 /* Calculation.m */,
+			);
+			name = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -222,6 +235,7 @@
 				7D01F2ED1B837DEB005EDD72 /* ViewController.m in Sources */,
 				7D01F2EA1B837DEB005EDD72 /* AppDelegate.m in Sources */,
 				7D01F2E71B837DEB005EDD72 /* main.m in Sources */,
+				7D01F30D1B877295005EDD72 /* Calculation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
