@@ -17,6 +17,7 @@
 @property UITableViewController* tableVC;
 @property CGSize kbSize;
 @property NSMutableArray *data;
+@property UIButton *button;
 
 @end
 
@@ -33,19 +34,64 @@
     _tableView.dataSource = self;
     _tableView.delegate = self;
     [_tableVC setTableView:_tableView];
-    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width, 30.0)];
-    [titleLabel setText:@"Welcome to Multiply"];
-    _data = [[NSMutableArray alloc] init];
-    for (int i=1; i <= NUMBER_OF_ROWS; i++) {
-        Calculation *calc = [[Calculation alloc] init];
-        calc.value1 = 12;
-        calc.value2 = i;
-        [_data addObject:calc];
-    }
     
-    [self.view addSubview:titleLabel];
+    
+    UIView* headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width, 40.0)];
+    [headerView setBackgroundColor:[UIColor cyanColor]];
+    
+    UILabel* titleLabel = [[UILabel alloc] initWithFrame:headerView.frame];
+    [titleLabel setBackgroundColor:[UIColor magentaColor]];
+    [titleLabel setText:@"Welcome to Multiply"];
+    [titleLabel setTextAlignment:NSTextAlignmentCenter];
+    [titleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
+    [headerView addSubview:titleLabel];
+    
+    [headerView addConstraint:[NSLayoutConstraint constraintWithItem:titleLabel
+                                                           attribute:NSLayoutAttributeCenterX
+                                                           relatedBy:NSLayoutRelationEqual
+                                                              toItem:headerView
+                                                           attribute:NSLayoutAttributeCenterX
+                                                          multiplier:1.0f
+                                                            constant:0]];
+    
+    [headerView addConstraint:[NSLayoutConstraint constraintWithItem:titleLabel
+                                                           attribute:NSLayoutAttributeCenterY
+                                                           relatedBy:NSLayoutRelationEqual
+                                                              toItem:headerView
+                                                           attribute:NSLayoutAttributeCenterY
+                                                          multiplier:1.0f
+                                                            constant:0]];
+    
+    _button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [_button setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [_button setTitle:@"Start" forState:UIControlStateNormal];
+    [_button setBackgroundColor:[UIColor yellowColor]];
+    [_button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [_button addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    _button.tag = 0;
+    [headerView addSubview:_button];
+    
+    [headerView addConstraint:[NSLayoutConstraint constraintWithItem:titleLabel
+                                                           attribute:NSLayoutAttributeRight
+                                                           relatedBy:NSLayoutRelationEqual
+                                                              toItem:_button
+                                                           attribute:NSLayoutAttributeLeft
+                                                          multiplier:1.0
+                                                            constant:-12.0]];
+    
+    [headerView addConstraint:[NSLayoutConstraint constraintWithItem:_button
+                                                           attribute:NSLayoutAttributeCenterY
+                                                           relatedBy:NSLayoutRelationEqual
+                                                              toItem:headerView
+                                                           attribute:NSLayoutAttributeCenterY
+                                                          multiplier:1.0
+                                                            constant:0.0]];
+    
+    _data = [[NSMutableArray alloc] init];
+    
+    [self.view addSubview:headerView];
     [self.view addSubview:_tableView];
-    [_tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -54,7 +100,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return NUMBER_OF_ROWS;
+    return [_data count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -70,48 +116,72 @@
         
     }
     UILabel *label=[[UILabel alloc] initWithFrame:cell.contentView.frame];
-    Calculation *calc = (Calculation*)_data[(long)indexPath.row];
-    NSString *myString =[NSString stringWithFormat:@"%i x %i", calc.value1, calc.value2];
+    long index = (long)indexPath.row;
+    Calculation *calc = (Calculation*)_data[index];
+    NSString *myString =[NSString stringWithFormat:@"%i x %i = ", calc.value1, calc.value2];
     [label setText:myString];
     [label setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [label setFrame:CGRectMake(20,10,50.0,15.0)];
-    UITextField *answer = [[UITextField alloc] initWithFrame:CGRectMake(70.0,5.0,40.0,25.0)];
-    [answer setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
+    [label setFrame:CGRectMake(20,10,80.0,15.0)];
+    CGRect rect = CGRectMake(100.0,5.0,40.0,25.0);
+    UITextField *answerTextField = [[UITextField alloc] initWithFrame:rect];
+    answerTextField.delegate = self;
     if ([calc hasAnswer]) {
-        [answer setText:[NSString stringWithFormat:@"%i", calc.answer]];
+        [answerTextField setText:[NSString stringWithFormat:@"%i", calc.answer]];
+        [answerTextField setEnabled:NO];
+        if ((calc.value1*calc.value2) == calc.answer) {
+            [answerTextField.layer setBorderColor:[[UIColor clearColor] CGColor]];
+            [answerTextField setBorderStyle:UITextBorderStyleNone];
+        } else {
+            [answerTextField setBorderStyle:UITextBorderStyleLine];
+            [answerTextField.layer setBorderColor:[[UIColor redColor] CGColor]];
+            [answerTextField.layer setCornerRadius:0.0f];
+            [answerTextField.layer setMasksToBounds:YES];
+            [answerTextField.layer setBorderWidth:1.0f];
+        }
+    } else {
+        //[answerTextField setText:[NSString stringWithFormat:@"%i", calc.answer]];
+        [answerTextField setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
+        [answerTextField setBorderStyle:UITextBorderStyleLine];
+        [answerTextField.layer setBorderColor:[[UIColor lightGrayColor] CGColor]];
+        [answerTextField.layer setCornerRadius:0.0f];
+        [answerTextField.layer setMasksToBounds:YES];
+        [answerTextField.layer setBorderWidth:1.0f];
+        //[answer reloadInputViews];
+        //[answerTextField setBackgroundColor:[UIColor lightGrayColor]];
     }
-    answer.delegate = self;
-    //[answer reloadInputViews];
-    [answer setBackgroundColor:[UIColor lightGrayColor]];
-    
     [cell.contentView addSubview:label];
-    [cell.contentView addSubview:answer];
+    [cell.contentView addSubview:answerTextField];
+    answerTextField.tag = indexPath.row;
+    
     cell.tag = indexPath.row;
-    answer.tag = indexPath.row;
-    //[cell addSubview:label];
-    //[label setFrame:CGRectMake(10.0, 10.0, 10.0, 10.0)];
     return cell;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
+    long index = textField.tag;
+    Calculation *calc = (Calculation*)_data[index];
+    calc.answer = [textField.text intValue];
+    _data[index] = calc;
+    NSIndexPath *path = [NSIndexPath indexPathForRow:(textField.tag) inSection:0];
+    [_tableView reloadRowsAtIndexPaths:@[path] withRowAnimation:UITableViewRowAnimationFade];
     if (textField.tag < (NUMBER_OF_ROWS-1)) {
-        long index = (long)[NSIndexPath indexPathForRow:(textField.tag) inSection:0];
-        Calculation *calc = (Calculation*)_data[index];
-        calc.answer = [textField.text intValue];
-        _data[index] = calc;
-        NSIndexPath *path = [NSIndexPath indexPathForRow:(textField.tag+1) inSection:0];
+        path = [NSIndexPath indexPathForRow:(textField.tag+1) inSection:0];
+        //[_tableView scrollToRowAtIndexPath:path atScrollPosition:UITableViewScrollPositionTop animated:YES];
         UITableViewCell *cell = [_tableView cellForRowAtIndexPath:path];
-        UITextField *answer = (UITextField*)cell.contentView.subviews[1];
-        [answer becomeFirstResponder];
+        UITextField *nextAnswer = (UITextField*)cell.contentView.subviews[1];
         [_tableView scrollToRowAtIndexPath:path atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        [nextAnswer becomeFirstResponder];
+    } else {
+        [_button setTitle:@"Go again" forState:UIControlStateNormal];
+        [_button setEnabled:YES];
     }
     return YES;
 }
 
 - (void) textFieldDidBeginEditing:(UITextField *)textField {
     if (textField.tag < (NUMBER_OF_ROWS-1)) {
-        NSIndexPath *path = [NSIndexPath indexPathForRow:(textField.tag+1) inSection:0];
+        NSIndexPath *   path = [NSIndexPath indexPathForRow:(textField.tag+1) inSection:0];
         
     }
 }
@@ -142,4 +212,18 @@
     
 }
 
+- (void)buttonTouchUpInside:(UIControl*)sender {
+    [_button setEnabled:NO];
+    [_data removeAllObjects];
+    int multiplier = arc4random_uniform(12) + 1;
+    for (int i=1; i <= NUMBER_OF_ROWS; i++) {
+        Calculation *calc = [[Calculation alloc] init];
+        calc.value1 = multiplier;
+        calc.value2 = i;
+        [_data addObject:calc];
+    }
+    [_tableView reloadData];
+    
+
+}
 @end
