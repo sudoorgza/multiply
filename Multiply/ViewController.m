@@ -16,6 +16,7 @@
 @property UITableView* tableView;
 @property UITableViewController* tableVC;
 @property CGSize kbSize;
+@property NSMutableDictionary *history;
 @property NSMutableArray *data;
 @property UIButton *button;
 
@@ -37,10 +38,10 @@
     
     
     UIView* headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width, 40.0)];
-    [headerView setBackgroundColor:[UIColor cyanColor]];
+    //[headerView setBackgroundColor:[UIColor cyanColor]];
     
     UILabel* titleLabel = [[UILabel alloc] initWithFrame:headerView.frame];
-    [titleLabel setBackgroundColor:[UIColor magentaColor]];
+    //[titleLabel setBackgroundColor:[UIColor magentaColor]];
     [titleLabel setText:@"Welcome to Multiply"];
     [titleLabel setTextAlignment:NSTextAlignmentCenter];
     [titleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -65,8 +66,8 @@
     
     _button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [_button setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [_button setTitle:@"Start" forState:UIControlStateNormal];
-    [_button setBackgroundColor:[UIColor yellowColor]];
+    [_button setTitle:@" Start " forState:UIControlStateNormal];
+    [_button setBackgroundColor:[UIColor colorWithRed:1.0f green:0.34f blue:0.13f alpha:1.0f]];
     [_button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [_button addTarget:self action:@selector(buttonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
     _button.tag = 0;
@@ -89,6 +90,7 @@
                                                             constant:0.0]];
     
     _data = [[NSMutableArray alloc] init];
+    _history = [[NSMutableDictionary alloc] init];
     
     [self.view addSubview:headerView];
     [self.view addSubview:_tableView];
@@ -173,7 +175,7 @@
         [_tableView scrollToRowAtIndexPath:path atScrollPosition:UITableViewScrollPositionTop animated:YES];
         [nextAnswer becomeFirstResponder];
     } else {
-        [_button setTitle:@"Go again" forState:UIControlStateNormal];
+        [_button setTitle:@" Go again " forState:UIControlStateNormal];
         [_button setEnabled:YES];
     }
     return YES;
@@ -212,15 +214,75 @@
     
 }
 
+- (BOOL)inHistory:(int)multiplier {
+    id obj = [_history objectForKey:@(multiplier).stringValue];
+    if (obj!= NULL) {
+        return true;
+    }
+    return false;
+    
+}
+
+- (NSArray*) getRandomTable {
+    NSMutableDictionary *tempDictionary=[[NSMutableDictionary alloc] init];
+    for (int i=1; i <= NUMBER_OF_ROWS; i++) {
+        int randomValue = (int)arc4random();
+        NSString *key = @(randomValue).stringValue;
+        [tempDictionary setValue:@(i) forKey:key];
+    }
+    
+    NSArray *sortedKeys = [[tempDictionary allKeys]
+                           sortedArrayWithOptions:NSSortStable
+                           usingComparator:^NSComparisonResult(id obj1, id obj2) {
+        int v1 = [(NSString*)obj1 intValue];
+        int v2 = [(NSString*)obj2 intValue];
+        if (v1 < v2) {
+            return NSOrderedAscending;
+        } else if (v2 < v1) {
+            return NSOrderedDescending;
+        } else {
+            return NSOrderedSame;
+        }
+    }];
+    NSMutableArray *table=[[NSMutableArray alloc] init];
+    for (int i=1; i <= NUMBER_OF_ROWS; i++) {
+        NSString *num = sortedKeys[i-1];
+        [table addObject:[tempDictionary valueForKey:num]];
+    }
+    return table;
+}
+
+- (NSArray *)sortKeysByIntValue:(NSDictionary *)dictionary {
+    
+    NSArray *sortedKeys = [dictionary keysSortedByValueUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        int v1 = [obj1 intValue];
+        int v2 = [obj2 intValue];
+        if (v1 < v2)
+            return NSOrderedAscending;
+        else
+            return NSOrderedDescending;
+    }];
+    return sortedKeys;
+}
+
 - (void)buttonTouchUpInside:(UIControl*)sender {
     [_button setEnabled:NO];
     [_data removeAllObjects];
+    if ([_history count] >= 12) {
+        _history = [[NSMutableDictionary alloc] init];
+    }
     int multiplier = arc4random_uniform(12) + 1;
-    for (int i=1; i <= NUMBER_OF_ROWS; i++) {
+    while ([self inHistory:multiplier]) {
+        multiplier = arc4random_uniform(12) + 1;
+    }
+    [_history setValue:@(true) forKey:@(multiplier).stringValue];
+    for (id item in [self getRandomTable]) {
+        NSNumber *i = item;
         Calculation *calc = [[Calculation alloc] init];
         calc.value1 = multiplier;
-        calc.value2 = i;
+        calc.value2 = i.intValue;
         [_data addObject:calc];
+        
     }
     [_tableView reloadData];
     
