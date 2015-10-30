@@ -38,10 +38,8 @@
     
     
     UIView* headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width, 40.0)];
-    //[headerView setBackgroundColor:[UIColor cyanColor]];
     
     UILabel* titleLabel = [[UILabel alloc] initWithFrame:headerView.frame];
-    //[titleLabel setBackgroundColor:[UIColor magentaColor]];
     [titleLabel setText:@"Welcome to Multiply"];
     [titleLabel setTextAlignment:NSTextAlignmentCenter];
     [titleLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -106,7 +104,7 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [_tableView dequeueReusableCellWithIdentifier:nil];
+    UITableViewCell *cell = [_tableView dequeueReusableCellWithIdentifier:@"CalculationCell"];
     if (cell == nil) {
         
         /*
@@ -141,15 +139,12 @@
             [answerTextField.layer setBorderWidth:1.0f];
         }
     } else {
-        //[answerTextField setText:[NSString stringWithFormat:@"%i", calc.answer]];
         [answerTextField setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
         [answerTextField setBorderStyle:UITextBorderStyleLine];
         [answerTextField.layer setBorderColor:[[UIColor lightGrayColor] CGColor]];
         [answerTextField.layer setCornerRadius:0.0f];
         [answerTextField.layer setMasksToBounds:YES];
         [answerTextField.layer setBorderWidth:1.0f];
-        //[answer reloadInputViews];
-        //[answerTextField setBackgroundColor:[UIColor lightGrayColor]];
     }
     [cell.contentView addSubview:label];
     [cell.contentView addSubview:answerTextField];
@@ -169,7 +164,6 @@
     [_tableView reloadRowsAtIndexPaths:@[path] withRowAnimation:UITableViewRowAnimationFade];
     if (textField.tag < (NUMBER_OF_ROWS-1)) {
         path = [NSIndexPath indexPathForRow:(textField.tag+1) inSection:0];
-        //[_tableView scrollToRowAtIndexPath:path atScrollPosition:UITableViewScrollPositionTop animated:YES];
         UITableViewCell *cell = [_tableView cellForRowAtIndexPath:path];
         UITextField *nextAnswer = (UITextField*)cell.contentView.subviews[1];
         [_tableView scrollToRowAtIndexPath:path atScrollPosition:UITableViewScrollPositionTop animated:YES];
@@ -179,13 +173,6 @@
         [_button setEnabled:YES];
     }
     return YES;
-}
-
-- (void) textFieldDidBeginEditing:(UITextField *)textField {
-    if (textField.tag < (NUMBER_OF_ROWS-1)) {
-        NSIndexPath *   path = [NSIndexPath indexPathForRow:(textField.tag+1) inSection:0];
-        
-    }
 }
 
 - (void)registerForKeyboardNotifications
